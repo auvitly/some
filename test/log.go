@@ -7,15 +7,15 @@ import (
 )
 
 type Record struct {
-	Field1 string `log:"-"`
-	Field2 string `log:"*"`
-	Field3 sql.NullBool
-	Field4 Field4
-	Field5 struct {
+	Field1, Field2 string `log:"-"`
+	Field3         string `log:"*"`
+	Field4         sql.NullBool
+	Field5         Field5
+	Field6         struct {
 		SubField5Field string
 	}
-	Field6 uuid.NullUUID
+	Field7 uuid.NullUUID
 }
 
-type Field4 struct {
+type Field5 struct {
 }

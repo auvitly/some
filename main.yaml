@@ -1,8 +1,26 @@
 name: test
 main: |-
-  {{- define "scan.imports" }}  
-    {{- "test/log.go" | go.AST.P.Files | var.Set "files" | void }}
-    {{- var.Get "files" | go.AST.I.Decl.Gen.Tok "import" | go.AST.I.Spec.Import.Paths | go.AST.I.Expr.BasicLit.Values | strings.Unquote | dump | os.OW "imports.log" | void }}
+  {{- "test/log.go" | go.AST.P.Files | var.Set "files" | void }}
+
+  {{- define "imports" }}  
+    {{- var.Get "files" | go.AST.I.Decl.Gen.Tok "import" | go.AST.I.Spec.Import.Paths | go.AST.I.Expr.BasicLit.Values | strings.Unquote | dump | os.OW "dumps/imports.log" | void }}
   {{- end }}
 
-  {{- template "scan.imports" }}
+  {{- template "imports" }}
+
+  {{- define "structs" }}  
+    {{- $types := var.Get "files" | go.AST.I.Decl.Gen.Tok "type" | go.AST.I.Spec.Types }}
+    {{- $structs := obj.List | obj.Set "Name" ($types | go.AST.I.Spec.Type.Names | go.AST.I.Expr.Ident.Names) | obj.Set "Type" ($types | go.AST.I.Spec.Type.Types) }}
+    {{- range $i, $struct := $structs }}
+      {{- $fields := obj.List }}
+      {{- range $j, $field := ($struct.Type | go.AST.I.Fields) }}
+        {{- range $k, $name := ($field.Names | go.AST.I.Expr.Ident.Names) }}
+          {{- $fields = $fields.Append (obj.Item | obj.Set "Type" ($field | go.AST.I.Field.Types | go.AST.F) | obj.Set "Name" $name) }}
+        {{- end }}
+      {{- end }}
+      {{- $struct | obj.Del "Type" | obj.Set "Fields" $fields | void }}
+    {{- end }}
+    {{- $structs | dump | os.OW "dumps/structs.log" | void }}
+  {{- end }}
+
+  {{- template "structs" }}

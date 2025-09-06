@@ -1,0 +1,43 @@
+╔═ DUMP ═
+║ Type:	obj.List
+╠═ Value:
+║ [
+║ 	[0]:{
+║ 		["Fields"]: [
+║ 			[0]:{
+║ 				["Type"]: "string"
+║ 				["Name"]: "Field1"
+║ 			}
+║ 			[1]:{
+║ 				["Name"]: "Field2"
+║ 				["Type"]: "string"
+║ 			}
+║ 			[2]:{
+║ 				["Type"]: "string"
+║ 				["Name"]: "Field3"
+║ 			}
+║ 			[3]:{
+║ 				["Type"]: "sql.NullBool"
+║ 				["Name"]: "Field4"
+║ 			}
+║ 			[4]:{
+║ 				["Type"]: "Field5"
+║ 				["Name"]: "Field5"
+║ 			}
+║ 			[5]:{
+║ 				["Type"]: "struct{ SubField5Field string }"
+║ 				["Name"]: "Field6"
+║ 			}
+║ 			[6]:{
+║ 				["Type"]: "uuid.NullUUID"
+║ 				["Name"]: "Field7"
+║ 			}
+║ 		]
+║ 		["Name"]: "Record"
+║ 	}
+║ 	[1]:{
+║ 		["Name"]: "Field5"
+║ 		["Fields"]: []
+║ 	}
+║ ]
+╚════════
