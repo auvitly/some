@@ -3,7 +3,7 @@ main: |-
   {{- "test/log.go" | go.AST.P.Files | var.Set "files" | void }}
 
   {{- define "imports" }}  
-    {{- var.Get "files" | go.AST.I.Decl.Gen.Tok "import" | go.AST.I.Spec.Import.Paths | go.AST.I.Expr.BasicLit.Values | strings.Unquote | dump | os.OW "dumps/imports.log" | void }}
+    {{- var.Get "files" | go.AST.I.Decl.Gen.Tok "import" | go.AST.I.Spec.Import.Paths | go.AST.I.Expr.BasicLit.Values | strings.Unquote | unique | dump | os.OW "dumps/imports.log" | void }}
   {{- end }}
 
   {{- template "imports" }}
@@ -15,7 +15,7 @@ main: |-
       {{- $fields := obj.List }}
       {{- range $j, $field := ($struct.Type | go.AST.I.Fields) }}
         {{- range $k, $name := ($field.Names | go.AST.I.Expr.Ident.Names) }}
-          {{- $fields = $fields.Append (obj.Item | obj.Set "Type" ($field | go.AST.I.Field.Types | go.AST.F) | obj.Set "Name" $name) }}
+          {{- $fields = $fields.Append (obj.Item | obj.Set "Type" ($field | go.AST.I.Field.Types | go.AST.F) | obj.Set "Name" $name | obj.Set "Tag(log)" (($field | go.AST.I.Field.Tag.Values | index 0).Get "log")) }}
         {{- end }}
       {{- end }}
       {{- $struct | obj.Del "Type" | obj.Set "Fields" $fields | void }}

@@ -4,6 +4,7 @@ import (
 	sql "database/sql"
 
 	uuid "github.com/google/uuid"
+	uuid1 "github.com/google/uuid"
 )
 
 type Record struct {
@@ -15,6 +16,7 @@ type Record struct {
 		SubField5Field string
 	}
 	Field7 uuid.NullUUID
+	Field8 uuid1.NullUUID
 }
 
 type Field5 struct {
