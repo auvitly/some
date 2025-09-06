@@ -1,0 +1,15 @@
+name: test
+main: |-
+  {{- define "scan" }}
+    {{- 
+      "test/test.go" |
+      go.AST.Parse.Files |
+      go.AST.Inspect.Decl.Gen.Tok "type" |
+      go.AST.Inspect.Spec.Types |
+      dump |
+      os.Overwrite "debug.log" |
+      void
+    }}
+  {{- end }}
+
+  {{- template "scan" }}

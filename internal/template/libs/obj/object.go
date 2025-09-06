@@ -1,0 +1,62 @@
+package obj
+
+import (
+	"fmt"
+	"reflect"
+)
+
+type List []Object
+
+type Object map[string]any
+
+func (o List) Set(field string, value any) (List, error) {
+	var rv = reflect.ValueOf(value)
+	switch {
+	case rv.Kind() != reflect.Slice:
+		return nil, fmt.Errorf("value must be a slice")
+	case rv.Len() != len(o):
+		if len(o) != 0 {
+			return nil, fmt.Errorf(
+				"for field \"%s\" not match length %d/%d for set field",
+				field, rv.Len(), len(o),
+			)
+		}
+
+		for i := range rv.Len() {
+			o = append(o, map[string]any{
+				field: rv.Index(i).Interface(),
+			})
+		}
+
+		return o, nil
+	default:
+		for i := range len(o) {
+			_, err := o[i].Set(field, rv.Index(i).Interface())
+			if err != nil {
+				return nil, err
+			}
+		}
+
+		return o, nil
+	}
+}
+
+func (o *List) Get(field string) any {
+	var values []any
+
+	for _, item := range *o {
+		values = append(values, item.Get(field))
+	}
+
+	return values
+}
+
+func (o Object) Set(field string, value any) (Object, error) {
+	o[field] = value
+
+	return o, nil
+}
+
+func (o Object) Get(field string) any {
+	return o[field]
+}
