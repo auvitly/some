@@ -15,7 +15,7 @@ main: |-
       {{- $fields := obj.List }}
       {{- range $j, $field := ($struct.Type | go.AST.I.Fields) }}
         {{- range $k, $name := ($field.Names | go.AST.I.Expr.Ident.Names) }}
-          {{- $fields = $fields.Append (obj.Item | obj.Set "Type" ($field | go.AST.I.Field.Types | go.AST.F) | obj.Set "Name" $name | obj.Set "Tag(log)" (($field | go.AST.I.Field.Tag.Values | index 0).Get "log")) }}
+          {{- $fields = $fields.Append (obj.Item | obj.Set "Name" $name | obj.Set "Type" ($field | go.AST.I.Field.Types | go.AST.F) | obj.Set "Tag(log)" (($field | go.AST.I.Field.Tag.Values | index 0).Get "log")) }}
         {{- end }}
       {{- end }}
       {{- $struct | obj.Del "Type" | obj.Set "Fields" $fields | void }}
