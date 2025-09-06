@@ -103,18 +103,20 @@ func dumpStruct(buf *bytes.Buffer, v reflect.Value, prefix string, visited Visit
 			fieldValue = v.Field(i)
 		)
 
-		var fieldTypeInfo = fmt.Sprintf("<%s>", getFieldTypeInfo(fieldValue))
+		if fieldType.IsExported() {
+			var fieldTypeInfo = fmt.Sprintf("<%s>", getFieldTypeInfo(fieldValue))
 
-		fmt.Fprintf(buf, "%s\t%s %s:", prefix, fieldType.Name, fieldTypeInfo)
+			fmt.Fprintf(buf, "%s\t%s %s:", prefix, fieldType.Name, fieldTypeInfo)
 
-		dumpValue(buf, fieldValue, prefix+"\t", visited)
+			dumpValue(buf, fieldValue, prefix+"\t", visited)
 
-		fmt.Fprintf(buf, "\n")
+			fmt.Fprintf(buf, "\n")
+		}
 	}
 
-	if v.NumField() == 0 {
-		fmt.Fprintf(buf, "\n")
-	}
+	// if v.NumField() == 0 {
+	// 	fmt.Fprintf(buf, "\n")
+	// }
 
 	fmt.Fprintf(buf, "%s}", prefix)
 }
@@ -181,9 +183,9 @@ func dumpMap(buf *bytes.Buffer, v reflect.Value, prefix string, visited Visited)
 			fmt.Fprintf(buf, "\n")
 		}
 
-		if v.Len() == 0 {
-			fmt.Fprintf(buf, "\n")
-		}
+		// if v.Len() == 0 {
+		// 	fmt.Fprintf(buf, "\n")
+		// }
 
 		fmt.Fprintf(buf, "%s}", prefix)
 	}
@@ -193,6 +195,12 @@ func dumpSlice(buf *bytes.Buffer, v reflect.Value, prefix string, visited Visite
 	if v.IsNil() {
 		fmt.Fprintf(buf, "<nil>")
 	} else {
+		if v.Len() == 0 {
+			fmt.Fprintf(buf, "[]")
+
+			return
+		}
+
 		fmt.Fprintf(buf, "[\n")
 
 		for i := 0; i < v.Len(); i++ {
@@ -203,24 +211,28 @@ func dumpSlice(buf *bytes.Buffer, v reflect.Value, prefix string, visited Visite
 			fmt.Fprintf(buf, "\n")
 		}
 
-		if v.Len() != 0 {
-			fmt.Fprintf(buf, "%s]", prefix)
-		} else {
-			fmt.Fprintf(buf, "\n%s]", prefix)
-		}
+		fmt.Fprintf(buf, "%s]", prefix)
 	}
 }
 
 func dumpArray(buf *bytes.Buffer, v reflect.Value, prefix string, visited Visited) {
+	if v.Len() == 0 {
+		fmt.Fprintf(buf, "[]")
+
+		return
+	}
+
 	fmt.Fprintf(buf, "[\n")
 
 	for i := 0; i < v.Len(); i++ {
 		fmt.Fprintf(buf, "%s\t[%d]:", prefix, i)
 
 		dumpValue(buf, v.Index(i), prefix+"\t", visited)
+
+		fmt.Fprintf(buf, "\n")
 	}
 
-	fmt.Fprintf(buf, "\n%s]", prefix)
+	fmt.Fprintf(buf, "%s]", prefix)
 }
 
 func value2typename(v reflect.Value) string {
@@ -233,27 +245,19 @@ func value2typename(v reflect.Value) string {
 	switch kind {
 	case reflect.Ptr:
 		if v.IsNil() {
-			return fmt.Sprintf("<%s>", iface2any(v.Type()))
+			return fmt.Sprintf("<%s>", v.Type())
 		}
 
-		return fmt.Sprintf("<*%s>", iface2any(v.Elem().Type()))
+		return fmt.Sprintf("<*%s>", v.Elem().Type())
 	case reflect.Interface:
 		if v.IsNil() {
-			return fmt.Sprintf("<%s>", iface2any(v.Type()))
+			return fmt.Sprintf("<%s>", v.Type())
 		}
 
-		return fmt.Sprintf("<%s:%s>", iface2any(v.Type()), iface2any(v.Elem().Type()))
+		return fmt.Sprintf("<%s:%s>", v.Type(), v.Elem().Type())
 	default:
-		return fmt.Sprintf("<%s>", iface2any(v.Type()))
+		return fmt.Sprintf("<%s>", v.Type())
 	}
-}
-
-func iface2any(t reflect.Type) string {
-	if t.String() == "interface {}" {
-		return "any"
-	}
-
-	return t.String()
 }
 
 func getFieldTypeInfo(v reflect.Value) string {
@@ -262,8 +266,8 @@ func getFieldTypeInfo(v reflect.Value) string {
 	}
 
 	if v.Kind() == reflect.Interface && !v.IsNil() {
-		return fmt.Sprintf("%s~%s", iface2any(v.Type()), iface2any(v.Elem().Type()))
+		return fmt.Sprintf("%s~%s", v.Type(), v.Elem().Type())
 	}
 
-	return iface2any(v.Type())
+	return v.Type().String()
 }

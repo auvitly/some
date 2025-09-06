@@ -1,6 +1,7 @@
 package engine
 
 import (
+	"bytes"
 	"fmt"
 	"reflect"
 	"strings"
@@ -15,30 +16,29 @@ func Debug(v ...any) (any, error) {
 
 	rv := reflect.ValueOf(v[len(v)-1])
 
-	var buf strings.Builder
+	var buf = bytes.NewBuffer(nil)
 
-	buf.WriteString("--- DEBUG\n")
+	fmt.Fprintf(buf, "╔═ DEBUG ═\n")
+	fmt.Fprintf(buf, "║ Type: %s\n", rv.Type().String())
+	fmt.Fprintf(buf, "╠═ Value:\n")
 
 	switch {
 	case len(v) == 1 && v[0] != nil:
 	case len(v) == 1 && v[0] == nil:
-		buf.WriteString(fmt.Sprintf(">> Value: %v\n", v))
-		buf.WriteString("---\n")
+		fmt.Fprintf(buf, "║\tValue: %v\n", v)
+		fmt.Fprintf(buf, "╚════════\n")
 
 		return buf.String(), nil
 	default:
-		buf.WriteString("---\n")
+		fmt.Fprintf(buf, "╚════════\n")
 
 		return buf.String(), nil
 	}
 
-	buf.WriteString("> Define\n")
-	buf.WriteString(fmt.Sprintf(">> Type: %s\n", rv.Type().String()))
-
 	if rv.Kind() == reflect.Pointer {
-		buf.WriteString(fmt.Sprintf(">> Value: %v\n", utils.Dereference(rv).Interface()))
+		fmt.Fprintf(buf, "║\tValue: %v\n", utils.Dereference(rv).Interface())
 	} else {
-		buf.WriteString(fmt.Sprintf(">> Value: %v\n", v))
+		fmt.Fprintf(buf, "║\tValue: %v\n", v)
 	}
 
 	switch utils.Dereference(rv).Kind() {
@@ -46,7 +46,7 @@ func Debug(v ...any) (any, error) {
 		var str = utils.Dereference(rv)
 
 		if str.NumField() != 0 {
-			buf.WriteString("> Fields\n")
+			buf.WriteString("║\tFields\n")
 		}
 
 		for i := range str.NumField() {
@@ -57,23 +57,23 @@ func Debug(v ...any) (any, error) {
 				continue
 			}
 
-			buf.WriteString(fmt.Sprintf(">> Field: %s | Type: %s | Value = %v\n", rt.Name, rt.Type.String(), rv.Interface()))
+			fmt.Fprintf(buf, "║\t\t%s | Type: %s | Value = %v\n", rt.Name, rt.Type.String(), rv.Interface())
 		}
 
 		if rv.Type().NumMethod() != 0 {
-			buf.WriteString("> Methods\n")
+			fmt.Fprintf(buf, "║\tMethods\n")
 		}
 
 		if rv.Kind() == reflect.Ptr {
 			for i := range rv.Type().NumMethod() {
 				method := rv.Type().Method(i)
 
-				buf.WriteString(fmt.Sprintf(">> %s%s \n", method.Name, strings.TrimPrefix(method.Type.String(), "func")))
+				fmt.Fprintf(buf, "║\t\t%s%s \n", method.Name, strings.TrimPrefix(method.Type.String(), "func"))
 			}
 		}
 	}
 
-	buf.WriteString("---\n")
+	fmt.Fprintf(buf, "╚════════\n")
 
 	return buf.String(), nil
 }

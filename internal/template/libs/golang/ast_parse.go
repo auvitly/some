@@ -6,6 +6,7 @@ import (
 	"reflect"
 
 	"github.com/auvitly/gopher/internal/template/libs/golang/internal"
+	"github.com/auvitly/gopher/internal/utils"
 	"golang.org/x/tools/go/packages"
 )
 
@@ -33,8 +34,13 @@ func (*parse) Project(paths ...string) (any, error) {
 	}
 }
 
-func (*parse) Packages(path ...string) ([]*packages.Package, error) {
-	return internal.ScanPackages(path...)
+func (*parse) Packages(v ...any) ([]*packages.Package, error) {
+	paths, err := utils.AnyTo[string](v)
+	if err != nil {
+		return nil, err
+	}
+
+	return internal.ScanPackages(paths...)
 }
 
 func (*parse) File(path string) (any, error) {

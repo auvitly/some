@@ -41,10 +41,10 @@ func (o List) Set(field string, value any) (List, error) {
 	}
 }
 
-func (o *List) Get(field string) any {
+func (o List) Get(field string) any {
 	var values []any
 
-	for _, item := range *o {
+	for _, item := range o {
 		values = append(values, item.Get(field))
 	}
 
@@ -59,4 +59,18 @@ func (o Object) Set(field string, value any) (Object, error) {
 
 func (o Object) Get(field string) any {
 	return o[field]
+}
+
+func (o List) Del(field string) List {
+	for _, item := range o {
+		item.Del(field)
+	}
+
+	return o
+}
+
+func (o Object) Del(field string) Object {
+	delete(o, field)
+
+	return o
 }

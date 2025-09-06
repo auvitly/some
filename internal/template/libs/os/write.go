@@ -7,19 +7,19 @@ import (
 	"path/filepath"
 )
 
-func write(name string, flag int, value any) error {
+func write(name string, flag int, value any) (any, error) {
 	dir := filepath.Dir(name)
 
 	// Создаем все необходимые директории (с правами 0755)
 	if err := os.MkdirAll(dir, 0755); err != nil {
-		return err
+		return nil, err
 	}
 
 	file, err := os.OpenFile(name, flag, 777)
 	if errors.Is(err, os.ErrNotExist) {
 		file, err = os.Create(name)
 		if err != nil {
-			return err
+			return nil, err
 		}
 	}
 
@@ -37,7 +37,7 @@ func write(name string, flag int, value any) error {
 	case interface{ String() (string, error) }:
 		str, err := v.String()
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		data = []byte(str)
@@ -47,8 +47,8 @@ func write(name string, flag int, value any) error {
 
 	_, err = file.Write(data)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return value, nil
 }

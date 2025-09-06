@@ -58,8 +58,109 @@ func (*inspectSpecType) Names(v any) ([]*goast.Ident, error) {
 	return names, nil
 }
 
+func (*inspectSpecType) Types(v any) ([]goast.Expr, error) {
+	specs, err := any2node[*goast.TypeSpec](v)
+	if err != nil {
+		return nil, err
+	}
+
+	var names []goast.Expr
+
+	for _, spec := range specs {
+		names = append(names, spec.Type)
+	}
+
+	return names, nil
+}
+
 func (*inspectSpec) Imports(pattern any) ([]*goast.ImportSpec, error) {
 	return any2node[*goast.ImportSpec](pattern)
+}
+
+type inspectSpecImport struct{}
+
+func (*inspectSpec) Import() any { return (*inspectSpecImport)(nil) }
+
+func (*inspectSpecImport) Name(pattern string, v any) ([]*goast.ImportSpec, error) {
+	specs, err := any2node[*goast.ImportSpec](v)
+	if err != nil {
+		return nil, err
+	}
+
+	var filtered []*goast.ImportSpec
+
+	reg, err := regexp.Compile(pattern)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, spec := range specs {
+		if spec.Name == nil {
+			continue
+		}
+
+		if reg.Match([]byte(spec.Name.Name)) {
+			filtered = append(filtered, spec)
+		}
+	}
+
+	return filtered, nil
+}
+
+func (*inspectSpecImport) Names(v any) ([]*goast.Ident, error) {
+	specs, err := any2node[*goast.ImportSpec](v)
+	if err != nil {
+		return nil, err
+	}
+
+	var names []*goast.Ident
+
+	for _, spec := range specs {
+		names = append(names, spec.Name)
+	}
+
+	return names, nil
+}
+
+func (*inspectSpecImport) Path(pattern string, v any) ([]*goast.ImportSpec, error) {
+	specs, err := any2node[*goast.ImportSpec](v)
+	if err != nil {
+		return nil, err
+	}
+
+	var filtered []*goast.ImportSpec
+
+	reg, err := regexp.Compile(pattern)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, spec := range specs {
+		if spec.Path == nil {
+			continue
+		}
+
+		if reg.Match([]byte(spec.Path.Value)) {
+			filtered = append(filtered, spec)
+		}
+	}
+
+	return filtered, nil
+}
+
+func (*inspectSpecImport) Paths(v any) ([]*goast.BasicLit, error) {
+	specs, err := any2node[*goast.ImportSpec](v)
+	if err != nil {
+		return nil, err
+	}
+
+	var names []*goast.BasicLit
+
+	for _, spec := range specs {
+		names = append(names, spec.Path)
+	}
+
+	return names, nil
 }
 
 func (*inspectSpec) Values(v any) ([]*goast.ValueSpec, error) {

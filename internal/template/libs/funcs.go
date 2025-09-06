@@ -14,6 +14,7 @@ import (
 	"github.com/auvitly/gopher/internal/template/libs/obj"
 	"github.com/auvitly/gopher/internal/template/libs/os"
 	"github.com/auvitly/gopher/internal/template/libs/psql"
+	"github.com/auvitly/gopher/internal/template/libs/strings"
 	"github.com/auvitly/gopher/internal/template/libs/variable"
 )
 
@@ -54,14 +55,15 @@ var Standard = template.FuncMap{
 
 	// 3 Extensions
 	// 3.1 General
-	"maps": maps.Lib,
-	"obj":  obj.Lib,
-	"os":   os.Lib,
-	"io":   io.Lib,
-	"json": json.Lib,
-	"go":   golang.Lib,
-	"env":  env.Lib,
-	"math": math.Lib,
-	"psql": psql.Lib,
-	"var":  variable.Lib,
+	"maps":    maps.Lib,
+	"obj":     obj.Lib,
+	"os":      os.Lib,
+	"io":      io.Lib,
+	"json":    json.Lib,
+	"go":      golang.Lib,
+	"env":     env.Lib,
+	"math":    math.Lib,
+	"psql":    psql.Lib,
+	"var":     variable.Lib,
+	"strings": strings.Lib,
 }

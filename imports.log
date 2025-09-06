@@ -1,0 +1,8 @@
+╔═ DUMP ═
+║ Type:	[]interface {}
+╠═ Value:
+║ [
+║ 	[0]:"database/sql"
+║ 	[1]:"github.com/google/uuid"
+║ ]
+╚════════

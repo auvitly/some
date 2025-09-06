@@ -1,15 +1,8 @@
 name: test
 main: |-
-  {{- define "scan" }}
-    {{- 
-      "test/test.go" |
-      go.AST.Parse.Files |
-      go.AST.Inspect.Decl.Gen.Tok "type" |
-      go.AST.Inspect.Spec.Types |
-      dump |
-      os.Overwrite "debug.log" |
-      void
-    }}
+  {{- define "scan.imports" }}  
+    {{- "test/log.go" | go.AST.P.Files | var.Set "files" | void }}
+    {{- var.Get "files" | go.AST.I.Decl.Gen.Tok "import" | go.AST.I.Spec.Import.Paths | go.AST.I.Expr.BasicLit.Values | strings.Unquote | dump | os.OW "imports.log" | void }}
   {{- end }}
 
-  {{- template "scan" }}
+  {{- template "scan.imports" }}

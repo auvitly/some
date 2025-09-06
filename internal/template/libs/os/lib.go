@@ -50,11 +50,11 @@ func (*lib) Read(name string) ([]byte, error) {
 	return data, nil
 }
 
-func (*lib) Write(name string, value any) error {
+func (*lib) Write(name string, value any) (any, error) {
 	return write(name, os.O_APPEND|os.O_WRONLY, value)
 }
 
-func (*lib) Overwrite(name string, value any) error {
+func (*lib) Overwrite(name string, value any) (any, error) {
 	return write(name, os.O_TRUNC|os.O_WRONLY, value)
 }
 
@@ -76,4 +76,10 @@ func (*lib) Stdin() io.Writer {
 
 func (*lib) Stderr() io.Writer {
 	return os.Stderr
+}
+
+// Shortcuts.
+
+func (l *lib) OW(name string, value any) (any, error) {
+	return l.Overwrite(name, value)
 }
