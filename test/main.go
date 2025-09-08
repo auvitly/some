@@ -9,14 +9,15 @@ import (
 type (
 	String  string
 	Int     int
-	Pointer *sql.NullBool
+	Pointer *string
 	Import  sql.NullBool
 	Alias   = Field5
 	Adapter Field5
 	Chan    chan string
-	Map     map[string]sql.NullBool
+	Map     map[string]string
 	Slice   []any
 	Array   [3]any
+	Matrix  [3][]any
 )
 
 type Record struct {

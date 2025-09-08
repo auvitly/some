@@ -68,7 +68,7 @@ loop:
 	return result, nil
 }
 
-func Contains(e any, s []any) bool {
+func Contains(s []any, e any) bool {
 	var (
 		ve = reflect.ValueOf(e)
 		vs = reflect.ValueOf(s)

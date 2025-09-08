@@ -2,15 +2,15 @@ name: types
 main: |-
   {{- "test/main.go" | go.AST.P.Files | go.AST.I.Decl.Gen.Tok "type" | go.AST.I.Spec.Types | v.Set "pipe" | void }}
 
-  {{- define "stage-1" }}
+  {{- define "Conveyor1" }}
     {{- must.Type "[]*ast.TypeSpec" . | void }}
     {{- $list := obj.List (len .) }}
     {{- $list | obj.Set "Name" (. | go.AST.I.Spec.Type.Names | go.AST.I.Expr.Ident.Names) | void }}
     {{- $list | obj.Set "Spec" (. | go.AST.I.Spec.Types) | void }}
-    {{- $list | v.Set "pipe" | void }}
+    {{- $list | v.Set "pipe"      | void }}
   {{- end }}
 
-  {{- define "stage-2" }}
+  {{- define "Conveyor2" }}
     {{- range $i, $item := (. | must.Type "obj.List")}}
       {{- $item | obj.Set "Spec" $item.Spec.Type | void }}
       {{- template "TypeSwitch" $item }}
@@ -19,28 +19,56 @@ main: |-
 
   {{- define "TypeSwitch" }} 
     {{- $item := . | must.Type "obj.Item" }}
-    {{- $item | must.NotNil | void }}
-
-    {{- if      $item.Spec | type.Of | eq "*ast.Ident"}}       {{- $item | obj.Set "Spec" $item.Spec.Name | void }}
-    {{- else if $item.Spec | type.Of | eq "*ast.StarExpr"}}    {{- $item | obj.Del "Spec" | void }}
-    {{- else if $item.Spec | type.Of | eq "*ast.SelectorExpr"}}{{- $item | obj.Del "Spec" | void }}
-    {{- else if $item.Spec | type.Of | eq "*ast.ChanType"}}    {{- $item | obj.Del "Spec" | void }}
-    {{- else if $item.Spec | type.Of | eq "*ast.MapType"}}     {{- $item | obj.Del "Spec" | void }}
-    {{- else if $item.Spec | type.Of | eq "*ast.ArrayType"}}   {{- template "TypeSwitch.ArrayType" $item }}
-    {{- else if $item.Spec | type.Of | eq "*ast.StructType"}}  {{- $item | obj.Del "Spec" | void }}
-    {{- else }}                                                {{- $item | obj.Del "Spec" | void }}
+    {{- $item      | must.NotNil | void   }}
+    {{- if      $item.Spec | type.Of | eq "*ast.Ident"}}        {{- template "TypeSwitch.Ident" $item }}
+    {{- else if $item.Spec | type.Of | eq "*ast.StarExpr"}}     {{- template "TypeSwitch.StarExpr" $item }}
+    {{- else if $item.Spec | type.Of | eq "*ast.SelectorExpr"}} {{- $item | obj.Del "Spec" | void }}
+    {{- else if $item.Spec | type.Of | eq "*ast.ChanType"}}     {{- template "TypeSwitch.ChanType" $item }}
+    {{- else if $item.Spec | type.Of | eq "*ast.MapType"}}      {{- template "TypeSwitch.MapType" $item }}
+    {{- else if $item.Spec | type.Of | eq "*ast.ArrayType"}}    {{- template "TypeSwitch.ArrayType" $item }}
+    {{- else if $item.Spec | type.Of | eq "*ast.StructType"}}   {{- $item | obj.Del "Spec" | void }}
+    {{- else }}                                                 {{- $item | obj.Del "Spec" | void }}
     {{- end }}
   {{- end }}
 
   {{- define "TypeSwitch.Ident" }}
-    {{- .     | must.Type "obj.Item"   | void }}
-    {{- .Spec | must.Type "*ast.Ident" | void }}
+    {{- .     | must.Type "obj.Item"      | void }}
+    {{- .Spec | must.Type "*ast.Ident"    | void }}
+    {{- .     | obj.Set "Type" .Spec.Name | void }}
+    {{- .     | obj.Del "Spec"            | void }}
+  {{- end }}
+
+  {{- define "TypeSwitch.StarExpr" }}
+    {{- .     | must.Type "obj.Item"       | void }}
+    {{- .Spec | must.Type "*ast.StarExpr"  | void }}
+    {{- .     | obj.Set "Type" "pointer"   | void }} 
+    {{- .     | obj.Set "Spec" (obj.Item | obj.Set "Spec" .Spec.X ) | void }}
+    {{- template "TypeSwitch" .Spec }}
+  {{- end }}
+
+  {{- define "TypeSwitch.ChanType" }}
+    {{- .     | must.Type "obj.Item"      | void }}
+    {{- .Spec | must.Type "*ast.ChanType" | void }}
+    {{- .     | obj.Set "Type" "chan"     | void }} 
+    {{- .     | obj.Set "Spec" (obj.Item  | obj.Set "Spec" .Spec.Value ) | void }}
+    {{- template "TypeSwitch" .Spec }}
+  {{- end }}
+
+  {{- define "TypeSwitch.MapType" }}
+    {{- .     | must.Type "obj.Item"       | void }}
+    {{- .Spec | must.Type "*ast.MapType"   | void }}
+    {{- .     | obj.Set "Type" "map"       | void }} 
+    {{- .     | obj.Set "Key"   (obj.Item  | obj.Set "Spec" .Spec.Key) | void }}
+    {{- .     | obj.Set "Value" (obj.Item  | obj.Set "Spec" .Spec.Value) | void }}
+    {{- .     | obj.Del "Spec"             | void }}
+    {{- template "TypeSwitch" .Key }}
+    {{- template "TypeSwitch" .Value }}
   {{- end }}
 
   {{- define "TypeSwitch.ArrayType" }}
     {{- .     | must.Type "obj.Item"       | void }}
     {{- .Spec | must.Type "*ast.ArrayType" | void }}
-    {{- if eq .Len null }} 
+    {{- if eq .Spec.Len null }} 
       {{- . | obj.Set "Type" "slice"   | void }} 
       {{- . | obj.Set "Spec" (obj.Item | obj.Set "Spec" .Spec.Elt ) | void }}
       {{- template "TypeSwitch" .Spec }}
@@ -52,7 +80,7 @@ main: |-
     {{- end }}
   {{- end }}
 
-  {{- template "stage-1" (v.Get "pipe") }}
-  {{- template "stage-2" (v.Get "pipe") }}
+  {{- template "Conveyor1" (v.Get "pipe") }}
+  {{- template "Conveyor2" (v.Get "pipe") }}
 
   {{- v.Get "pipe" | dump | os.OW "dump/main.log" | void }}
