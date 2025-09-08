@@ -1,0 +1,132 @@
+[
+  {
+    "Name": "String",
+    "Type": "string"
+  },
+  {
+    "Name": "Int",
+    "Type": "int"
+  },
+  {
+    "Name": "Pointer",
+    "Spec": {
+      "Type": "string"
+    },
+    "Type": "pointer"
+  },
+  {
+    "Name": "Import"
+  },
+  {
+    "Name": "Alias",
+    "Type": "Field5"
+  },
+  {
+    "Name": "Adapter",
+    "Type": "Field5"
+  },
+  {
+    "Name": "Chan",
+    "Spec": {
+      "Type": "string"
+    },
+    "Type": "chan"
+  },
+  {
+    "Key": {
+      "Type": "string"
+    },
+    "Name": "Map",
+    "Type": "map",
+    "Value": {
+      "Type": "string"
+    }
+  },
+  {
+    "Name": "Slice",
+    "Spec": {
+      "Type": "any"
+    },
+    "Type": "slice"
+  },
+  {
+    "Len": "3",
+    "Name": "Array",
+    "Spec": {
+      "Type": "any"
+    },
+    "Type": "array"
+  },
+  {
+    "Len": "3",
+    "Name": "Matrix",
+    "Spec": {
+      "Spec": {
+        "Type": "any"
+      },
+      "Type": "slice"
+    },
+    "Type": "array"
+  },
+  {
+    "Fields": [
+      {
+        "Name": "Field1",
+        "Spec": {
+          "Type": "string"
+        }
+      },
+      {
+        "Name": "Field2",
+        "Spec": {
+          "Type": "string"
+        }
+      },
+      {
+        "Name": "Field3",
+        "Spec": {
+          "Type": "string"
+        }
+      },
+      {
+        "Name": "Field4",
+        "Spec": {}
+      },
+      {
+        "Name": "Field5",
+        "Spec": {
+          "Type": "Field5"
+        }
+      },
+      {
+        "Name": "Field6",
+        "Spec": {
+          "Fields": [
+            {
+              "Name": "SubField5Field",
+              "Spec": {
+                "Type": "string"
+              }
+            }
+          ],
+          "Type": "struct"
+        }
+      },
+      {
+        "Name": "Field7",
+        "Spec": {}
+      },
+      {
+        "Name": "Field8",
+        "Spec": {}
+      }
+    ],
+    "Name": "Record",
+    "Type": "struct"
+  },
+  {
+    "Fields": [],
+    "Name": "Field5",
+    "Type": "struct"
+  }
+]
