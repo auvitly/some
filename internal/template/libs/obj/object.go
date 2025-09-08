@@ -5,11 +5,11 @@ import (
 	"reflect"
 )
 
-type List []Object
+type List []Item
 
-type Object map[string]any
+type Item map[string]any
 
-func (l List) Append(o Object) (List, error) {
+func (l List) Append(o Item) (List, error) {
 	return append(l, o), nil
 }
 
@@ -35,6 +35,10 @@ func (l List) Set(field string, value any) (List, error) {
 		return l, nil
 	default:
 		for i := range len(l) {
+			if l[i] == nil {
+				l[i] = make(Item)
+			}
+
 			_, err := l[i].Set(field, rv.Index(i).Interface())
 			if err != nil {
 				return nil, err
@@ -55,13 +59,13 @@ func (l List) Get(field string) any {
 	return values
 }
 
-func (o Object) Set(field string, value any) (Object, error) {
+func (o Item) Set(field string, value any) (Item, error) {
 	o[field] = value
 
 	return o, nil
 }
 
-func (o Object) Get(field string) any {
+func (o Item) Get(field string) any {
 	return o[field]
 }
 
@@ -73,7 +77,7 @@ func (o List) Del(field string) List {
 	return o
 }
 
-func (o Object) Del(field string) Object {
+func (o Item) Del(field string) Item {
 	delete(o, field)
 
 	return o

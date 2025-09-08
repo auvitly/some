@@ -19,7 +19,7 @@ import (
 )
 
 func main() {
-	file, err := os.Open("main.yaml")
+	file, err := os.Open("templates/main.yaml")
 	if err != nil {
 		os.Stderr.Write([]byte(err.Error()))
 		os.Exit(2)

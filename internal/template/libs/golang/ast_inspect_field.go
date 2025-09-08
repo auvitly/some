@@ -2,8 +2,10 @@ package golang
 
 import (
 	goast "go/ast"
-	"reflect"
+	"strconv"
 	"strings"
+
+	"github.com/auvitly/gopher/internal/template/libs/golang/internal"
 )
 
 type inspectField struct{}
@@ -59,23 +61,79 @@ type inspectFieldTag struct{}
 
 func (*inspectField) Tag() any { return (*inspectFieldTag)(nil) }
 
-func (*inspectFieldTag) Values(v any) ([]reflect.StructTag, error) {
+func (*inspectFieldTag) Values(v any) ([]internal.Tags, error) {
 	fields, err := any2node[*goast.Field](v)
 	if err != nil {
 		return nil, err
 	}
 
-	var tags []reflect.StructTag
+	var tags []internal.Tags
 
 	for _, field := range fields {
 		if field.Tag != nil {
-			tags = append(tags, reflect.StructTag(strings.Trim(field.Tag.Value, "`")))
+			tags = append(tags, parseStructTag(strings.Trim(field.Tag.Value, "`")))
 		} else {
-			tags = append(tags, "")
+			tags = append(tags, nil)
 		}
 	}
 
 	return tags, nil
+}
+
+func parseStructTag(tag string) internal.Tags {
+	var tags = make(internal.Tags)
+
+	for tag != "" {
+		i := 0
+
+		for i < len(tag) && tag[i] == ' ' {
+			i++
+		}
+
+		tag = tag[i:]
+
+		if tag == "" {
+			break
+		}
+
+		i = 0
+
+		for i < len(tag) && tag[i] > ' ' && tag[i] != ':' && tag[i] != '"' && tag[i] != 0x7f {
+			i++
+		}
+
+		if i == 0 || i+1 >= len(tag) || tag[i] != ':' || tag[i+1] != '"' {
+			break
+		}
+
+		name := string(tag[:i])
+		tag = tag[i+1:]
+
+		i = 1
+
+		for i < len(tag) && tag[i] != '"' {
+			if tag[i] == '\\' {
+				i++
+			}
+			i++
+		}
+
+		if i >= len(tag) {
+			break
+		}
+
+		qvalue := string(tag[:i+1])
+		tag = tag[i+1:]
+
+		value, err := strconv.Unquote(qvalue)
+		if err != nil {
+			break
+		}
+
+		tags[name] = value
+	}
+
+	return tags
 }
 
 // Docs.

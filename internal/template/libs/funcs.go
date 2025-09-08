@@ -1,7 +1,6 @@
 package libs
 
 import (
-	"reflect"
 	"text/template"
 
 	"github.com/auvitly/gopher/internal/template/libs/engine"
@@ -9,11 +8,12 @@ import (
 	"github.com/auvitly/gopher/internal/template/libs/golang"
 	"github.com/auvitly/gopher/internal/template/libs/io"
 	"github.com/auvitly/gopher/internal/template/libs/json"
-	"github.com/auvitly/gopher/internal/template/libs/maps"
 	"github.com/auvitly/gopher/internal/template/libs/math"
+	"github.com/auvitly/gopher/internal/template/libs/must"
 	"github.com/auvitly/gopher/internal/template/libs/obj"
 	"github.com/auvitly/gopher/internal/template/libs/os"
 	"github.com/auvitly/gopher/internal/template/libs/psql"
+	"github.com/auvitly/gopher/internal/template/libs/reflect"
 	"github.com/auvitly/gopher/internal/template/libs/strings"
 	"github.com/auvitly/gopher/internal/template/libs/variable"
 )
@@ -21,13 +21,11 @@ import (
 var Standard = template.FuncMap{
 	// 1 Format:
 	// 1.1 Vold/Debug
-	"doc":     engine.Doc,
-	"log":     engine.Log,
-	"void":    engine.Void,
-	"debug":   engine.Debug,
-	"dump":    engine.Dump,
-	"typeof":  reflect.TypeOf,
-	"valueof": reflect.ValueOf,
+	"doc":   engine.Doc,
+	"log":   engine.Log,
+	"void":  engine.Void,
+	"debug": engine.Debug,
+	"dump":  engine.Dump,
 	// 1.2 Symbols
 	"ln":    engine.Line,
 	"tab":   engine.Tab,
@@ -44,6 +42,7 @@ var Standard = template.FuncMap{
 	"bytes":  engine.Bytes,
 	"bool":   engine.Bool,
 	"map":    engine.Map,
+	"error":  engine.Error,
 	// 2.2 Funcs for types
 	"unique":   engine.Unique,
 	"contains": engine.Contains,
@@ -55,7 +54,6 @@ var Standard = template.FuncMap{
 
 	// 3 Extensions
 	// 3.1 General
-	"maps":    maps.Lib,
 	"obj":     obj.Lib,
 	"os":      os.Lib,
 	"io":      io.Lib,
@@ -65,5 +63,8 @@ var Standard = template.FuncMap{
 	"math":    math.Lib,
 	"psql":    psql.Lib,
 	"var":     variable.Lib,
+	"v":       variable.Lib,
 	"strings": strings.Lib,
+	"type":    reflect.LibType,
+	"must":    must.Lib,
 }

@@ -24,7 +24,7 @@ func dumpWithConfig(obj any) any {
 	var buf = bytes.NewBuffer(nil)
 
 	fmt.Fprintf(buf, "╔═ DUMP ═\n")
-	fmt.Fprintf(buf, "║ Type:\t%T\n", obj)
+	fmt.Fprintf(buf, "║ Type:  %T\n", obj)
 	fmt.Fprintf(buf, "╠═ Value:\n")
 
 	var prefix = "║ "
@@ -95,6 +95,12 @@ func dumpStruct(buf *bytes.Buffer, v reflect.Value, prefix string, visited Visit
 		typename = value2typename(v)
 	)
 
+	if v.NumField() == 0 {
+		fmt.Fprintf(buf, "%s {}", typename)
+
+		return
+	}
+
 	fmt.Fprintf(buf, "%s {\n", typename)
 
 	for i := range v.NumField() {
@@ -106,17 +112,13 @@ func dumpStruct(buf *bytes.Buffer, v reflect.Value, prefix string, visited Visit
 		if fieldType.IsExported() {
 			var fieldTypeInfo = fmt.Sprintf("<%s>", getFieldTypeInfo(fieldValue))
 
-			fmt.Fprintf(buf, "%s\t%s %s:", prefix, fieldType.Name, fieldTypeInfo)
+			fmt.Fprintf(buf, "%s  %s %s:", prefix, fieldType.Name, fieldTypeInfo)
 
-			dumpValue(buf, fieldValue, prefix+"\t", visited)
+			dumpValue(buf, fieldValue, prefix+"  ", visited)
 
 			fmt.Fprintf(buf, "\n")
 		}
 	}
-
-	// if v.NumField() == 0 {
-	// 	fmt.Fprintf(buf, "\n")
-	// }
 
 	fmt.Fprintf(buf, "%s}", prefix)
 }
@@ -166,47 +168,47 @@ func dumpInterface(buf *bytes.Buffer, v reflect.Value, prefix string, visited Vi
 }
 
 func dumpMap(buf *bytes.Buffer, v reflect.Value, prefix string, visited Visited) {
+	var typename = value2typename(v)
+
 	if v.IsNil() {
-		fmt.Fprintf(buf, "<nil>\n")
+		fmt.Fprintf(buf, "%s{}", typename)
 	} else {
-		fmt.Fprintf(buf, "{\n")
+		fmt.Fprintf(buf, "%s{\n", typename)
 
 		for _, key := range v.MapKeys() {
-			fmt.Fprintf(buf, "%s\t[", prefix)
+			fmt.Fprintf(buf, "%s  [", prefix)
 
-			dumpValue(buf, key, "\t", visited)
+			dumpValue(buf, key, "  ", visited)
 
 			fmt.Fprintf(buf, "]: ")
 
-			dumpValue(buf, v.MapIndex(key), prefix+"\t", visited)
+			dumpValue(buf, v.MapIndex(key), prefix+"  ", visited)
 
 			fmt.Fprintf(buf, "\n")
 		}
-
-		// if v.Len() == 0 {
-		// 	fmt.Fprintf(buf, "\n")
-		// }
 
 		fmt.Fprintf(buf, "%s}", prefix)
 	}
 }
 
 func dumpSlice(buf *bytes.Buffer, v reflect.Value, prefix string, visited Visited) {
+	var typename = value2typename(v)
+
 	if v.IsNil() {
-		fmt.Fprintf(buf, "<nil>")
+		fmt.Fprintf(buf, "%s[]", typename)
 	} else {
 		if v.Len() == 0 {
-			fmt.Fprintf(buf, "[]")
+			fmt.Fprintf(buf, "%s[]", typename)
 
 			return
 		}
 
-		fmt.Fprintf(buf, "[\n")
+		fmt.Fprintf(buf, "%s[\n", typename)
 
 		for i := 0; i < v.Len(); i++ {
-			fmt.Fprintf(buf, "%s\t[%d]:", prefix, i)
+			fmt.Fprintf(buf, "%s  [%d]:", prefix, i)
 
-			dumpValue(buf, v.Index(i), prefix+"\t", visited)
+			dumpValue(buf, v.Index(i), prefix+"  ", visited)
 
 			fmt.Fprintf(buf, "\n")
 		}
@@ -225,9 +227,9 @@ func dumpArray(buf *bytes.Buffer, v reflect.Value, prefix string, visited Visite
 	fmt.Fprintf(buf, "[\n")
 
 	for i := 0; i < v.Len(); i++ {
-		fmt.Fprintf(buf, "%s\t[%d]:", prefix, i)
+		fmt.Fprintf(buf, "%s  [%d]:", prefix, i)
 
-		dumpValue(buf, v.Index(i), prefix+"\t", visited)
+		dumpValue(buf, v.Index(i), prefix+"  ", visited)
 
 		fmt.Fprintf(buf, "\n")
 	}
