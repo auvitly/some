@@ -3,8 +3,8 @@
 ╠═ Value:
 ║ <obj.List>[
 ║   [0]:<obj.Item>{
-║     ["Name"]: "String"
 ║     ["Type"]: "string"
+║     ["Name"]: "String"
 ║   }
 ║   [1]:<obj.Item>{
 ║     ["Name"]: "Int"
@@ -53,23 +53,23 @@
 ║     ["Type"]: "slice"
 ║   }
 ║   [9]:<obj.Item>{
+║     ["Len"]: "3"
 ║     ["Name"]: "Array"
 ║     ["Spec"]: <obj.Item>{
 ║       ["Type"]: "any"
 ║     }
 ║     ["Type"]: "array"
-║     ["Len"]: "3"
 ║   }
 ║   [10]:<obj.Item>{
-║     ["Name"]: "Matrix"
 ║     ["Spec"]: <obj.Item>{
-║       ["Type"]: "slice"
 ║       ["Spec"]: <obj.Item>{
 ║         ["Type"]: "any"
 ║       }
+║       ["Type"]: "slice"
 ║     }
 ║     ["Type"]: "array"
 ║     ["Len"]: "3"
+║     ["Name"]: "Matrix"
 ║   }
 ║   [11]:<obj.Item>{
 ║     ["Name"]: "Record"

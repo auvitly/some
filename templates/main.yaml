@@ -18,15 +18,15 @@ main: |-
   {{- end }}
 
   {{- define "TypeSwitch" }} 
-    {{- $item := . | must.Type "obj.Item" }}
-    {{- $item      | must.NotNil | void   }}
-    {{- if      $item.Spec | type.Of | eq "*ast.Ident"}}        {{- template "TypeSwitch.Ident" $item }}
-    {{- else if $item.Spec | type.Of | eq "*ast.StarExpr"}}     {{- template "TypeSwitch.StarExpr" $item }}
-    {{- else if $item.Spec | type.Of | eq "*ast.SelectorExpr"}} {{- $item | obj.Del "Spec" | void }}
-    {{- else if $item.Spec | type.Of | eq "*ast.ChanType"}}     {{- template "TypeSwitch.ChanType" $item }}
-    {{- else if $item.Spec | type.Of | eq "*ast.MapType"}}      {{- template "TypeSwitch.MapType" $item }}
-    {{- else if $item.Spec | type.Of | eq "*ast.ArrayType"}}    {{- template "TypeSwitch.ArrayType" $item }}
-    {{- else if $item.Spec | type.Of | eq "*ast.StructType"}}   {{- $item | obj.Del "Spec" | void }}
+    {{- $item := . | must.Type "obj.Item" | must.NotNil }}
+    {{- $type := $item.Spec | type.Of }}
+    {{- if      $type | eq "*ast.Ident"}}        {{- template "TypeSwitch.Ident" $item }}
+    {{- else if $type | eq "*ast.StarExpr"}}     {{- template "TypeSwitch.StarExpr" $item }}
+    {{- else if $type | eq "*ast.SelectorExpr"}} {{- $item | obj.Del "Spec" | void }}
+    {{- else if $type | eq "*ast.ChanType"}}     {{- template "TypeSwitch.ChanType" $item }}
+    {{- else if $type | eq "*ast.MapType"}}      {{- template "TypeSwitch.MapType" $item }}
+    {{- else if $type | eq "*ast.ArrayType"}}    {{- template "TypeSwitch.ArrayType" $item }}
+    {{- else if $type | eq "*ast.StructType"}}   {{- $item | obj.Del "Spec" | void }}
     {{- else }}                                                 {{- $item | obj.Del "Spec" | void }}
     {{- end }}
   {{- end }}
