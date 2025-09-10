@@ -1,6 +1,7 @@
 package golang
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"reflect"
@@ -88,7 +89,11 @@ func (*parse) Files(values ...any) (any, error) {
 
 			for _, item := range list {
 				file, err := internal.ScanFile(fmt.Sprintf("%v", item))
-				if err != nil {
+
+				switch {
+				case errors.Is(err, os.ErrNotExist):
+					continue
+				case err != nil:
 					return nil, err
 				}
 

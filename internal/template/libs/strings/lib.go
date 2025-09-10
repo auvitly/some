@@ -2,6 +2,7 @@ package strings
 
 import (
 	"strconv"
+	"strings"
 
 	"github.com/auvitly/gopher/internal/utils"
 )
@@ -19,6 +20,20 @@ func (*lib) Unquote(v ...any) (any, error) {
 func (*lib) Quote(v ...any) (any, error) {
 	return any2stringFunc(func(s string) (any, error) {
 		return strconv.Quote(s), nil
+	}, v)
+}
+
+func (*lib) Trim(str string, v ...any) (any, error) {
+	return any2stringFunc(func(s string) (any, error) {
+		return strings.Trim(s, str), nil
+	}, v)
+}
+
+func (*lib) CutPrefix(str string, v ...any) (any, error) {
+	return any2stringFunc(func(s string) (any, error) {
+		s, _ = strings.CutPrefix(s, str)
+
+		return s, nil
 	}, v)
 }
 
