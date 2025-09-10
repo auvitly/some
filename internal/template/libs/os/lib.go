@@ -83,3 +83,7 @@ func (*lib) Stderr() io.Writer {
 func (l *lib) OW(name string, value any) (any, error) {
 	return l.Overwrite(name, value)
 }
+
+func (l *lib) W(name string, value any) (any, error) {
+	return l.Write(name, value)
+}

@@ -12,9 +12,9 @@ type ast struct{}
 
 // Fullnames.
 
-func (*ast) Format(v ...any) (any, error) { return (*format)(nil).Node(v...) }
-func (*ast) Inspect() any                 { return (*inspect)(nil) }
-func (*ast) Parse() any                   { return (*parse)(nil) }
+func (*ast) Format(v ...any) (any, error) { return new(format).Node(v...) }
+func (*ast) Inspect() any                 { return new(inspect) }
+func (*ast) Parse() any                   { return new(parse) }
 
 // Shortcuts.
 

@@ -40,7 +40,7 @@ func (*inspectDeclFunc) CommentGroups(v any) ([]*goast.CommentGroup, error) {
 	return comments, nil
 }
 
-func (*inspectDeclFunc) Receivers(v any) ([]*goast.FieldList, error) {
+func (*inspectDeclFunc) Recvs(v any) ([]*goast.FieldList, error) {
 	var recvs []*goast.FieldList
 
 	funcDecls, err := any2node[*goast.FuncDecl](v)
@@ -53,6 +53,42 @@ func (*inspectDeclFunc) Receivers(v any) ([]*goast.FieldList, error) {
 	}
 
 	return recvs, nil
+}
+
+func (*inspectDeclFunc) Recv(pattern string, v any) ([]*goast.FuncDecl, error) {
+	var decls []*goast.FuncDecl
+
+	funcDecls, err := any2node[*goast.FuncDecl](v)
+	if err != nil {
+		return nil, err
+	}
+
+	re, err := regexp.Compile(pattern)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, funcDecl := range funcDecls {
+		if funcDecl.Recv == nil {
+			continue
+		}
+
+		if len(funcDecl.Recv.List) != 1 {
+			continue
+		}
+
+		if len(funcDecl.Recv.List[0].Names) != 0 {
+			continue
+		}
+
+		if !re.MatchString(funcDecl.Recv.List[0].Names[0].Name) {
+			continue
+		}
+
+		decls = append(decls, funcDecl)
+	}
+
+	return decls, nil
 }
 
 func (*inspectDeclFunc) Types(v any) ([]*goast.FuncType, error) {

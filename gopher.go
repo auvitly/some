@@ -72,7 +72,7 @@ func main() {
 
 	tmpl, err := template.New("main").
 		Funcs(fnMap).
-		Parse(m["main"].(string))
+		Parse(m["template"].(string))
 	if err != nil {
 		os.Stderr.Write([]byte(err.Error()))
 		os.Exit(2)

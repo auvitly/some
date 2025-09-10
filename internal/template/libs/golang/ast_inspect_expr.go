@@ -25,7 +25,11 @@ func (*inspectExprIdent) Names(v any) ([]any, error) {
 	var list = make([]any, 0, len(exprs))
 
 	for _, expr := range exprs {
-		list = append(list, expr.Name)
+		if expr == nil {
+			list = append(list, nil)
+		} else {
+			list = append(list, expr.Name)
+		}
 	}
 
 	return list, nil
@@ -54,7 +58,11 @@ func (*inspectExprBasicLit) Values(v any) ([]any, error) {
 	var list = make([]any, 0, len(exprs))
 
 	for _, expr := range exprs {
-		list = append(list, expr.Value)
+		if expr == nil {
+			list = append(list, nil)
+		} else {
+			list = append(list, expr.Value)
+		}
 	}
 
 	return list, nil
@@ -137,7 +145,11 @@ func (*inspectExprStructType) FieldLists(v any) ([]*goast.FieldList, error) {
 	var fieldLists []*goast.FieldList
 
 	for _, item := range list {
-		fieldLists = append(fieldLists, item.Fields)
+		if item == nil {
+			fieldLists = append(fieldLists, nil)
+		} else {
+			fieldLists = append(fieldLists, item.Fields)
+		}
 	}
 
 	return fieldLists, nil

@@ -1,0 +1,11 @@
+{
+  "project-layout": {
+    "layouts": {
+      "types": [
+        "provider",
+        "service",
+        "api"
+      ]
+    }
+  }
+}

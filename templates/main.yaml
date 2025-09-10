@@ -1,17 +1,35 @@
 name: types
-main: |-
-  {{- "test/main.go" | go.AST.P.Files | go.AST.I.Decl.Gen.Tok "type" | go.AST.I.Spec.Types | v.Set "pipe" | void }}
+template: |-
+  {{- $files := "test/main.go" | go.AST.P.Files }}
+  {{- $files | go.AST.I.Decl.Gen.Tok "import" | go.AST.I.Spec.Imports | v.Set "p.imports" | void }}
+  {{- $files | go.AST.I.Decl.Gen.Tok "type"   | go.AST.I.Spec.Types   | v.Set "p.types"   | void }}
 
-  {{- define "Conveyor1" }}
-    {{- must.Type "[]*ast.TypeSpec" . | void }}
+  {{- define "ScanImports" }}
+    {{- must.Type "[]*ast.ImportSpec" . | void }}
     {{- $list := obj.List (len .) }}
-    {{- $list | obj.Set "Name" (. | go.AST.I.Spec.Type.Names | go.AST.I.Expr.Ident.Names) | void }}
-    {{- $list | obj.Set "Spec" (. | go.AST.I.Spec.Types) | void }}
-    {{- $list | v.Set "pipe"      | void }}
+    {{- $list | obj.Set "Path" (. | go.AST.I.Spec.Import.Paths | go.AST.I.Expr.BasicLit.Values   | strings.Unquote ) | void }}
+    {{- $list | v.Set "p.imports" | void }}
+
+    {{- range $i, $item := $list }}
+      {{- 
+        go.AST.P.Packages $item.Path  | go.AST.I.Decl.Gen.Tok "type"     |
+        go.AST.I.Spec.Type.Name "^[A-Z]" | 
+        go.AST.I.Spec.Type.Names      | go.AST.I.Expr.Ident.Names        | 
+        dump | os.OW (printf "dump/%s.log" $item.Path) | void 
+      }}
+    {{- end }}
   {{- end }}
 
-  {{- define "Conveyor2" }}
-    {{- range $i, $item := (. | must.Type "obj.List")}}
+  {{- define "GrepTypes" }}
+    {{- must.Type "[]*ast.TypeSpec" . | void }}
+    {{- $list := obj.List (len .) }}
+    {{- $list | obj.Set "Name"  (. | go.AST.I.Spec.Type.Names | go.AST.I.Expr.Ident.Names) | void }}
+    {{- $list | obj.Set "Spec"  (. | go.AST.I.Spec.Types) | void }}
+    {{- $list | v.Set "p.types" | void }}
+  {{- end }}
+
+  {{- define "ScanTypes" }}
+    {{- range $i, $item := (. | must.Type "obj.List") }}
       {{- $item | obj.Set "Spec" $item.Spec.Type | void }}
       {{- template "TypeSwitch" $item }}
     {{- end }}
@@ -83,21 +101,23 @@ main: |-
   {{- define "TypeSwitch.StructType" }}
     {{- .     | must.Type "obj.Item"        | void }}
     {{- .Spec | must.Type "*ast.StructType" | void }}
-    {{- .     | obj.Set "Type" "struct"    | void }} 
+    {{- .     | obj.Set "Type" "struct"     | void }} 
     {{- $fields := obj.List }} 
     {{- range $i, $item := (.Spec | go.AST.I.Fields) }}
       {{- range $j, $name := ($item.Names | go.AST.I.Expr.Ident.Names)}}
         {{- $field := obj.Item }}
         {{- $field | obj.Set "Name" $name      | void }}
-        {{- $field | obj.Set "Spec" (obj.Item  | obj.Set "Spec" $item.Type) | dump }}
+        {{- $field | obj.Set "Spec" (obj.Item  | obj.Set "Spec" $item.Type) | void }}
         {{- template "TypeSwitch" $field.Spec }}
         {{- $fields = $fields.Append $field }}
       {{- end }}
     {{- end }}
-    {{- . | obj.Set "Fields" $fields | obj.Del "Spec" }}
+    {{- . | obj.Set "Fields" $fields | obj.Del "Spec" | void }}
   {{- end }}
 
-  {{- template "Conveyor1" (v.Get "pipe") }}
-  {{- template "Conveyor2" (v.Get "pipe") }}
+  {{- template "ScanImports" (v.Get "p.imports") }}
 
-  {{- v.Get "pipe" | json.Marshal "  " | os.OW "dump/main.json" | void }}
+  {{- template "GrepTypes"   (v.Get "p.types")   }}
+  {{- template "ScanTypes"   (v.Get "p.types")   }}
+
+  {{- v.Get "p.types" | json.Marshal "  " | os.OW "dump/main.json" | void }}

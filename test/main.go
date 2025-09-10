@@ -1,7 +1,7 @@
 package test
 
 import (
-	"database/sql"
+	sql "database/sql"
 
 	"github.com/google/uuid"
 )
@@ -14,7 +14,7 @@ type (
 	Alias   = Field5
 	Adapter Field5
 	Chan    chan string
-	Map     map[string]string
+	Map     map[*string]string
 	Slice   []any
 	Array   [3]any
 	Matrix  [3][]any

@@ -4,14 +4,14 @@ import goast "go/ast"
 
 type inspect struct{}
 
-func (*inspect) Decl() any     { return (*inspectDecl)(nil) }
-func (*inspect) Spec() any     { return (*inspectSpec)(nil) }
-func (*inspect) Stmt() any     { return (*inspectStmt)(nil) }
-func (*inspect) Field() any    { return (*inspectField)(nil) }
-func (*inspect) Expr() any     { return (*inspectExpr)(nil) }
-func (*inspect) File() any     { return (*inspectFile)(nil) }
-func (*inspect) Package() any  { return (*inspectPackage)(nil) }
-func (*inspect) Position() any { return (*inspectPosition)(nil) }
+func (*inspect) Decl() any     { return new(inspectDecl) }
+func (*inspect) Spec() any     { return new(inspectSpec) }
+func (*inspect) Stmt() any     { return new(inspectStmt) }
+func (*inspect) Field() any    { return new(inspectField) }
+func (*inspect) Expr() any     { return new(inspectExpr) }
+func (*inspect) File() any     { return new(inspectFile) }
+func (*inspect) Package() any  { return new(inspectPackage) }
+func (*inspect) Position() any { return new(inspectPosition) }
 
 func (*inspect) Decls(v any) ([]goast.Decl, error)    { return any2node[goast.Decl](v) }
 func (*inspect) Specs(v any) ([]goast.Spec, error)    { return any2node[goast.Spec](v) }

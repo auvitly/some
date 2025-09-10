@@ -14,9 +14,8 @@ func ScanPackages(patterns ...string) ([]*packages.Package, error) {
 
 	packages, err := packages.Load(
 		&packages.Config{
-			Mode:  packages.LoadFiles | packages.LoadImports | packages.LoadAllSyntax | packages.NeedForTest,
-			Dir:   os.Getenv("PWD"),
-			Tests: true,
+			Mode: packages.LoadFiles | packages.LoadImports | packages.LoadAllSyntax,
+			Dir:  os.Getenv("PWD"),
 		},
 		patterns...,
 	)

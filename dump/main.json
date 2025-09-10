@@ -34,7 +34,10 @@
   },
   {
     "Key": {
-      "Type": "string"
+      "Spec": {
+        "Type": "string"
+      },
+      "Type": "pointer"
     },
     "Name": "Map",
     "Type": "map",

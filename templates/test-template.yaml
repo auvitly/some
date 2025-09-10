@@ -1,0 +1,45 @@
+namespace: "test"
+title: "generate_func"
+doc:
+template: |-
+  {{- json.Read "test/json.json" | dump }}
+
+  {{ define "main1" }}
+  {{- $names := "internal/template/libs/env/lib.go" | go.AST.P.Files | go.AST.I.Decl.Func.Name "^[A-Z]" | go.AST.I.Decl.Func.Names | go.AST.I.Expr.Ident.Names }} 
+
+
+  {{- printf 
+  `package env_test
+
+  import (
+    "testing"
+  )` | ln | ln 
+  | os.OW "internal/template/libs/env/lib_test.go"  | void }}
+
+  {{- range $i, $name := $names }}
+  {{- printf 
+  `func Test%s(t *testing.T) {
+    t.Parallel()
+
+    var tests = []struct{
+      Name string
+    }{
+      {
+        Name: "Example name",
+      },
+    }
+
+    for i := range tests {
+      var test = tests[i]
+
+      t.Run(test.Name, func(tt *testing.T) {
+        tt.Parallel()
+
+        // Do something! 
+      })
+    }
+  }` $name | ln | ln 
+  | os.W "internal/template/libs/env/lib_test.go" | void  
+  }}
+  {{- end }}
+  {{- end }}
